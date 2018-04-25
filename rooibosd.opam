@@ -1,7 +1,7 @@
 opam-version: "1.2"
 version: "0.1"
 maintainer: "christimperley@cs.cmu.edu"
-authors: ["cst", "rvt"]
+authors: ["cst" "rvt"]
 homepage: "https://github.com/squaresLab/rooibosd"
 bug-reports: "https://github.com/squaresLab/rooibosd/issues"
 dev-repo: "https://github.com/squaresLab/rooibosd.git"
