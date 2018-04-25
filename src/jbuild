@@ -6,5 +6,8 @@
 
 (alias
  ((name DEFAULT)
-  (deps
-   (rooibosd.exe))))
+  (deps (rooibosd.exe))))
+
+(install
+ ((section bin)
+  (files ((rooibosd.exe as rooibosd)))))
