@@ -1,0 +1,23 @@
+swagger: '2.0'
+info:
+  description: |
+    Official documentation for the rooibosd RESTful API.
+  version: '1.0'
+  title: rooibosd
+  contact:
+    name: rooibosd on GitHub
+    url: https://github.com/squaresLab/rooibosd
+host: localhost
+basePath: /v1
+# definitions:
+paths:
+  /status:
+    get:
+      summary: Status of the server.
+      description: >-
+        Produces a diagnostic summary of the health of the server.
+      produces:
+        - application/json
+      responses:
+        204:
+          description: Server is healthy and running.
