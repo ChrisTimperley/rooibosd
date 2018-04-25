@@ -1,0 +1,10 @@
+(jbuild_version 1)
+
+(executable
+ ((libraries (core_kernel opium rooibos))
+  (name rooibosd)))
+
+(alias
+ ((name DEFAULT)
+  (deps
+   (rooibosd.exe))))
