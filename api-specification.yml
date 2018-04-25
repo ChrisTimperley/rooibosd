@@ -90,6 +90,22 @@ paths:
       summary: Substitutes a set of provided arguments into a given template.
       produces:
         - application/json
+      parameters:
+        - in: body
+          name: Parameters
+          required: true
+          schema:
+            type: object
+            properties:
+              template:
+                type: string
+                example: "if ([:1] < [:2])"
+              arguments:
+                additionalProperties:
+                  type: string
+                example:
+                  "1": "x"
+                  "2": "3"
       responses:
         200:
           description: OK
@@ -97,6 +113,6 @@ paths:
             type: string
             description: >-
               The result of performing substitution on the input source.
-            example: "x >= 3"
+            example: "if (x < 3)"
         400:
           description: Failed to parse provided arguments or source code.
