@@ -13,4 +13,10 @@ clean:
 uninstall:
 	jbuilder uninstall
 
-.PHONY: all install test clean uninstall
+docker-build:
+	docker build -t squareslab/rooibosd .
+
+docker-push:
+	docker push squareslab/rooibosd
+
+.PHONY: all install test clean uninstall docker-build docker-push
