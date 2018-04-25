@@ -7,12 +7,52 @@ info:
   contact:
     name: rooibosd on GitHub
     url: https://github.com/squaresLab/rooibosd
-host: localhost
+host: rooibosd
 basePath: /v1
 
 definitions:
+  Location:
+    type: string
+    description: >-
+      Describes the location of a character in a body of text as a string of
+      the form "line:col", where "line" is the one-indexed number of the line
+      to which the character belongs, and "column" is the one-indexed number of
+      the column to which the character belongs.
+    example: "10:4"
+
+  LocationRange:
+    type: string
+    example: "10:4::10:5"
+
+  BoundTerm:
+    type: object
+    properties:
+      term:
+        type: string
+        description: The name of the term.
+        example: "cond"
+      location:
+        description: >-
+          The location range of the source code to which this term is bound.
+        $ref: '#/definitions/LocationRange'
+      content:
+        type: string
+        description: >-
+          The source code to which this term is bound.
+        example: "x < 3"
+
+  Environment:
+    type: array
+    items:
+      $ref: '#/definitions/BoundTerm'
+
   Match:
     type: object
+    properties:
+      location:
+        $ref: '#/definitions/LocationRange'
+      environment:
+        $ref: '#/definitions/Environment'
 
 paths:
   /status:
