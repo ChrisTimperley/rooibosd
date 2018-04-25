@@ -84,3 +84,19 @@ paths:
               $ref: '#/definitions/Match'
         400:
           description: Failed to parse provided template or source code.
+
+  /substitute:
+    get:
+      summary: Substitutes a set of provided arguments into a given template.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            type: string
+            description: >-
+              The result of performing substitution on the input source.
+            example: "x >= 3"
+        400:
+          description: Failed to parse provided arguments or source code.
