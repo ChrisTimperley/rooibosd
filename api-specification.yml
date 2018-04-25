@@ -26,6 +26,10 @@ definitions:
 
   BoundTerm:
     type: object
+    required:
+      - term
+      - location
+      - content
     properties:
       term:
         type: string
@@ -48,6 +52,9 @@ definitions:
 
   Match:
     type: object
+    required:
+      - location
+      - environment
     properties:
       location:
         $ref: '#/definitions/LocationRange'
@@ -71,8 +78,26 @@ paths:
       summary: Find all matches of a template in a source text.
       description: >-
         Finds all matches of a provided template in a given source text.
+      consumes:
+        - application/json
       produces:
         - application/json
+      parameters:
+        - in: body
+          name: Parameters
+          required: true
+          schema:
+            type: object
+            required:
+              - source
+              - template
+            properties:
+              source:
+                type: string
+                example: "if (x < y)"
+              template:
+                type: string
+                example: "if (:[1] < :[2])"
       responses:
         200:
           description: OK
@@ -88,14 +113,19 @@ paths:
   /substitute:
     get:
       summary: Substitutes a set of provided arguments into a given template.
-      produces:
+      consumes:
         - application/json
+      produces:
+        - text/plain
       parameters:
         - in: body
           name: Parameters
           required: true
           schema:
             type: object
+            required:
+              - template
+              - arguments
             properties:
               template:
                 type: string
@@ -116,3 +146,52 @@ paths:
             example: "if (x < 3)"
         400:
           description: Failed to parse provided arguments or source code.
+
+  /rewrite:
+    get:
+      summary: Rewrite all matches in a given source text.
+      description: >-
+        Rewrites all matches of a given template in a provided source text
+        using a rewrite template and an optional set of arguments to that
+        rewrite template.
+      consumes:
+        - application/json
+      produces:
+        - text/plain
+      parameters:
+        - in: body
+          name: Parameters
+          required: true
+          schema:
+            type: object
+            required:
+              - source
+              - match
+              - rewrite
+              - arguments
+            properties:
+              source:
+                type: string
+                example: "if (x < y)"
+              match:
+                type: string
+                example: "if ([:1] < [:2])"
+              rewrite:
+                type: string
+                example: "if ([:2] [:op] [:1])"
+              arguments:
+                additionalProperties:
+                  type: string
+                example:
+                  "op": ">="
+      responses:
+        200:
+          description: OK
+          schema:
+            type: string
+            description: >-
+              The result of performing rewriting on the given source.
+            example: "if (y >= x)"
+        400:
+          description: >-
+            Failed to parse provided source code, templates, or arguments.
