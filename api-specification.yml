@@ -9,7 +9,11 @@ info:
     url: https://github.com/squaresLab/rooibosd
 host: localhost
 basePath: /v1
-# definitions:
+
+definitions:
+  Match:
+    type: object
+
 paths:
   /status:
     get:
@@ -21,3 +25,22 @@ paths:
       responses:
         204:
           description: Server is healthy and running.
+
+  /matches:
+    get:
+      summary: Find all matches of a template in a source text.
+      description: >-
+        Finds all matches of a provided template in a given source text.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            description: >-
+              A list of all matches that were found.
+            items:
+              $ref: '#/definitions/Match'
+        400:
+          description: Failed to parse provided template or source code.
