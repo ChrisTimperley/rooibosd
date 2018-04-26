@@ -44,10 +44,12 @@ let substitute =
       request |> App.json_of_body_exn >>= (fun jsn ->
         let template = find (value jsn) ["template"] |> get_string in
         let args = find (value jsn) ["arguments"] in
+        let env = json_args_to_env args in
+        Lwt_log.ign_log_f ~level:Info "POST /substitute";
         Lwt_log.ign_log_f ~level:Info "Arguments: %s" (args |> wrap |> to_string);
-        Lwt_log.ign_log_f ~level:Info "Substitute GET request.";
+        Lwt_log.ign_log_f ~level:Info "Environment: %s" (Environment.to_string env);
         let subbed =
-            Environment.substitute (json_args_to_env args) (to_term template)
+            Environment.substitute env (to_term template)
             |> Printer.to_string
         in
         Lwt_log.ign_log_f ~level:Info "Substitution was successful.";
