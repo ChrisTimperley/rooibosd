@@ -58,12 +58,8 @@ let environment_to_json env : Ezjsonm.value =
 
 let match_to_json (m : Match.t) : Ezjsonm.value =
   let open Ezjsonm in
-  let env = m in (*Match.environment m in*)
-  let mock_location =
-    Location.Range.create
-      (Location.create 1 5 0)
-      (Location.create 1 15 0)
-  in
+  let env = Match.environment m in
+  let location = Match.range m in
   let properties =
     [("location", (location_to_json mock_location));
      ("environment", (environment_to_json env))]
