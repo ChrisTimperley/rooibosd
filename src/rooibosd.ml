@@ -5,7 +5,6 @@ open Opium.Std
 
 open Rooibos
 
-let (^/) = Filename.concat
 let (>>>=) = Result.Monad_infix.(>>=)
 
 let bad_request message =
@@ -26,32 +25,36 @@ let to_term s =
   | Parser.Error ->
     failwith (Format.asprintf "Syntax error in %s\n" s)
 
-let rewrite =
-  App.get "/rewrite/:source/:match_template/:rewrite_template" (fun request ->
-      let source = "source" |> param request in
-      let match_template = "match_template" |> param request in
-      let rewrite_template = "rewrite_template" |> param request in
-      Lwt_log.ign_log_f ~level:Info "Rewrite GET request.";
-      Lwt_log.ign_log_f ~level:Info "Source  : %s" source;
-      Lwt_log.ign_log_f ~level:Info "Matcher : %s" match_template;
-      Lwt_log.ign_log_f ~level:Info "Rewrite : %s" rewrite_template;
-      match
-        Match.all (to_term match_template) (to_term source) |>
-        Sequence.to_list
-      with
-      | env::_ ->
-        let rewritten =
-          Environment.substitute env (to_term rewrite_template)
-          |> Printer.to_string
+let to_var s = (s, 0)
+
+let json_args_to_env (args: Ezjsonm.value) : Environment.t =
+  let open Ezjsonm in
+  let var_to_term : (Term.variable * Term.t) list =
+    get_dict args |>
+    List.map ~f:(fun (k, v) -> ((k |> to_var), (v |> get_string |> to_term)))
+  in
+  List.fold_left
+    ~init:(Environment.create ())
+    ~f:(fun env (var, term) -> Environment.add env var term)
+    var_to_term
+
+let substitute =
+  App.post "/substitute" (fun request ->
+      let open Ezjsonm in
+      request |> App.json_of_body_exn >>= (fun jsn ->
+        let template = find (value jsn) ["template"] |> get_string in
+        let args = find (value jsn) ["arguments"] in
+        Lwt_log.ign_log_f ~level:Info "Arguments: %s" (args |> wrap |> to_string);
+        Lwt_log.ign_log_f ~level:Info "Substitute GET request.";
+        let subbed =
+            Environment.substitute (json_args_to_env args) (to_term template)
+            |> Printer.to_string
         in
-        Lwt_log.ign_log_f ~level:Info "Rewrite succeeded.";
-        respond' ~code:`OK (`String rewritten)
-      | _ ->
-        Lwt_log.ign_log_f ~level:Info "Rewrite failed.";
-        respond' ~code:`Unprocessable_entity (`String "No match"))
+        Lwt_log.ign_log_f ~level:Info "Substitution was successful.";
+        respond' ~code:`OK (`String subbed)))
 
 let _ =
   Lwt_log_core.Section.set_level Lwt_log_core.Section.main Debug;
   App.empty
-  |> rewrite
+  |> substitute
   |> App.run_command
