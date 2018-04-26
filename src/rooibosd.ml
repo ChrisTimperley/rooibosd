@@ -58,11 +58,9 @@ let environment_to_json env : Ezjsonm.value =
 
 let match_to_json (m : Match.t) : Ezjsonm.value =
   let open Ezjsonm in
-  let env = Match.environment m in
-  let location = Match.range m in
   let properties =
-    [("location", (location_to_json mock_location));
-     ("environment", (environment_to_json env))]
+    [("location", (Match.range m |> location_to_json));
+     ("environment", (Match.environment m |> environment_to_json))]
   in
     dict properties
 
