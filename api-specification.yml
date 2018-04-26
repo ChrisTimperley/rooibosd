@@ -74,7 +74,7 @@ paths:
           description: Server is healthy and running.
 
   /matches:
-    get:
+    post:
       summary: Find all matches of a template in a source text.
       description: >-
         Finds all matches of a provided template in a given source text.
@@ -111,7 +111,7 @@ paths:
           description: Failed to parse provided template or source code.
 
   /substitute:
-    get:
+    post:
       summary: Substitutes a set of provided arguments into a given template.
       consumes:
         - application/json
@@ -148,7 +148,7 @@ paths:
           description: Failed to parse provided arguments or source code.
 
   /rewrite:
-    get:
+    post:
       summary: Rewrite all matches in a given source text.
       description: >-
         Rewrites all matches of a given template in a provided source text
