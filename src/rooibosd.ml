@@ -46,7 +46,7 @@ let bound_term_to_json var term : Ezjsonm.value =
   let open Ezjsonm in
   [
     ("term", (string var_name));
-    ("content", (string "CONTENT"));
+    ("content", (Printer.to_string term |> string));
     ("location", (term |> Term.range |> location_to_json))
   ] |> dict
 
@@ -63,6 +63,9 @@ let match_to_json (m : Match.t) : Ezjsonm.value =
      ("environment", (Match.environment m |> environment_to_json))]
   in
     dict properties
+
+let status =
+  App.get "/status" (fun request -> respond' ~code:`No_content (`String ""))
 
 let substitute =
   App.post "/substitute" (fun request ->
@@ -91,7 +94,7 @@ let matches =
         Lwt_log.ign_log_f ~level:Info "Source: %s" source;
         Lwt_log.ign_log_f ~level:Info "Template: %s" template;
         Lwt_log.ign_log_f ~level:Info "Source (Term): %s" (source |> to_term |> Term.to_string);
-        Lwt_log.ign_log_f ~level:Info "Template (Term): %s" (source |> to_term |> Term.to_string);
+        Lwt_log.ign_log_f ~level:Info "Template (Term): %s" (template |> to_term |> Term.to_string);
 
         (* find all of the matches *)
         let matches =
@@ -106,6 +109,7 @@ let matches =
 let _ =
   Lwt_log_core.Section.set_level Lwt_log_core.Section.main Debug;
   App.empty
+  |> status
   |> substitute
   |> matches
   |> App.run_command
