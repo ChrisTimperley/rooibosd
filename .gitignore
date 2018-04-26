@@ -1,0 +1,5 @@
+*.swp
+*.swo
+.merlin
+rooibosd.install
+_build
