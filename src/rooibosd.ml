@@ -19,6 +19,11 @@ let to_result = function
   | Ok x -> Result.Ok x
   | Error e -> Result.Error (Error.to_string_hum e)
 
+let make_env bindings =
+  List.fold bindings
+    ~init:(Environment.create ())
+    ~f:(fun env (v, term) -> Environment.add env (v,0) term)
+
 let to_term s =
   let lexbuf = Lexing.from_string s in
   try Parser.main Lexer.read lexbuf with
@@ -54,7 +59,7 @@ let environment_to_json env : Ezjsonm.value =
   let open Ezjsonm in
   (Environment.vars env) |>
   list (fun v -> bound_term_to_json v (Environment.lookup env v)) |>
-  unwrap
+  value
 
 let match_to_json (m : Match.t) : Ezjsonm.value =
   let open Ezjsonm in
